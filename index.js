@@ -3,9 +3,12 @@ import dotenv from "dotenv";
 import amqp from "amqplib/callback_api.js";
 import redis from "redis";
 import asyncRedis from "async-redis";
+import express from "express";
 import { handel_problem_submission } from "./controllers/problem_submission_controller.js";
 import { handel_playground_submission } from "./controllers/playground_submission_controller.js";
 import { handel_contest_submission } from "./controllers/contest_submission_controller.js";
+
+const app = express();
 
 dotenv.config();
 export let redisClient;
@@ -109,13 +112,15 @@ const connect_to_redis = async () => {
 };
 
 const startup = async () => {
-  try {
-    await connect_to_mongoDB();
-    await connect_to_rabbitMQ();
-    await connect_to_redis();
-  } catch (err) {
-    console.log("Error during startup:", err);
-  }
+  app.listen(process.env.PORT || 8083, async () => {
+    try {
+      await connect_to_mongoDB();
+      await connect_to_rabbitMQ();
+      await connect_to_redis();
+    } catch (err) {
+      console.log("Error during startup:", err);
+    }
+  });
 };
 
 startup();
